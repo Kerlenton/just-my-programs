@@ -15,7 +15,7 @@ main()
 		case '-': printf("Result -> %.2f\n", x - y); break;
 		case '*': printf("Result -> %.2f\n", x*y); break;
 		case '/': printf("Result -> %.2f\n", x / y); break;
-		default: printf("Operator don't found:(\n");
+		default: printf("Operator don't found:(\n"); break;
 		}
 	}
 	return 0;
