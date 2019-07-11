@@ -25,7 +25,7 @@ main()
 			bin(number);
 
 		else
-			printf("Enter a number that is no more than 128 bits or equal to 128 bits\n");
+			printf("Enter a number that is no more than 8 bytes or equal to 8 bytes\n");
 	}
 
 	return 0;
