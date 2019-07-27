@@ -3,20 +3,21 @@
 
 main()
 {
-	double x, y;
+	float x, y;
 	char symbol;
 
 	while (TRUE) {
 		printf("Calculator -> ");
-		scanf("%lf %c %lf", &x, &symbol, &y);
+		scanf("%f %c %f", &x, &symbol, &y);
 
 		switch (symbol) {
-		case '+': printf("Result -> %.2lf\n", x + y); break;
-		case '-': printf("Result -> %.2lf\n", x - y); break;
-		case '*': printf("Result -> %.2lf\n", x*y); break;
-		case '/': printf("Result -> %.2lf\n", x / y); break;
-		default: printf("Operator don't found:(\n"); break;
+		case '+': printf("Result -> %.3f\n", x + y); break;
+		case '-': printf("Result -> %.3f\n", x - y); break;
+		case '*': printf("Result -> %.3f\n", x*y); break;
+		case '/': printf("Result -> %.3f\n", x / y); break;
+		default: printf("Operator don't found\n"); break;
 		}
 	}
 	return 0;
 }
+
