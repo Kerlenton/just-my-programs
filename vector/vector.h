@@ -24,21 +24,13 @@ typedef enum
 	STRING_ELEM
 } vtype;
 
-typedef union
-{
-	int64_t *decimal;
-	double *real;
-	uint8_t **string;
-} data;
-
 typedef struct Vector
 {
 	size_t size; 
 	size_t capacity;
 	size_t element_size;
 
-	vtype type;
-	data data;
+	uint8_t **data;
 } Vector;
 
 typedef struct Iterator
@@ -49,32 +41,56 @@ typedef struct Iterator
 
 #endif
 
+
+
+
+
+
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
 
 
-extern int vector_setup(Vector *vector, size_t capacity, size_t element_size);
+
+
+
+//..
+int vector_setup(Vector* vector, size_t capacity, size_t element_size);
 extern int vector_copy(Vector *dst, Vector *src);
 extern int vector_copy_assign(Vector *dst, Vector *src);
 extern int vector_move(Vector *dst, Vector *src);
 extern int vector_move_assign(Vector *dst, Vector *src);
 extern int vector_swap(Vector *dst, Vector *src);
 
+
+
+
+
+
+
+
 // Insertion
+extern int vector_push_back(Vector *vector, uint8_t **element);
 
-extern int vector_push_back(Vector *vector, void *element);
 
 
-//-------------------------
 
+
+
+//.....
 extern bool vector_is_initialized(const Vector *vector);
 extern size_t vector_byte_size(const Vector *vector);
 extern int vector_destroy(Vector *vector);
 
+
+
+
+
+
+// Static
 static void _vector_swap(size_t *first, size_t *second);
-static bool _vector_shlould_grow(Vector *vector);
+static bool _vector_should_grow(Vector *vector);
 static int _vector_adjust_capacity(Vector *vector);
-static int _vector_realocate(Vector *vector, size_t new_capacity);
-static void _vector_assign(Vector *vector, size_t index, void *element);
+static int _vector_reallocate(Vector *vector, size_t new_capacity);
+static void _vector_assign(Vector *vector, size_t index, uint8_t **element);
 void* _vector_offset(Vector* vector, size_t index);
 
 
