@@ -9,16 +9,26 @@ int main()
 {
 	Vector *v = (Vector*)malloc(sizeof(Vector));
 	uint8_t *p = "helllo";
-	int64_t q = 8;
+	uint8_t *q = "hi";
+	uint8_t *r = "he";
 	vector_setup(v, 5, sizeof(uint8_t*));
 	vector_push_back(v, &p);
-	printf("%s", v->data[0]);
+	vector_push_back(v, &q);
 
+	printf("%s\n", *(v->data));
+	printf("%s\n", *(v->data + v->element_size));
+
+	vector_assign(v, 0, &r);
+
+	printf("%s\n", *(v->data));
+	printf("%s\n", *(v->data + v->element_size));
+
+	getchar();
 	system("PAUSE");
 	return 0;
 }
 
-int vector_setup(Vector* vector, size_t capacity, size_t element_size) 
+extern int vector_setup(Vector* vector, size_t capacity, size_t element_size) 
 {
 	assert(vector != NULL);
 
@@ -32,94 +42,94 @@ int vector_setup(Vector* vector, size_t capacity, size_t element_size)
 	return vector->data == NULL ? VECTOR_ERROR : VECTOR_SUCCESS;
 }
 
-int vector_copy(Vector* destination, Vector* source) 
+extern int vector_copy(Vector* dst, Vector* src)
 {
-	assert(destination != NULL);
-	assert(source != NULL);
-	assert(vector_is_initialized(source));
-	assert(!vector_is_initialized(destination));
+	assert(dst != NULL);
+	assert(src != NULL);
+	assert(vector_is_initialized(src));
+	assert(!vector_is_initialized(dst));
 
-	if (destination == NULL) return VECTOR_ERROR;
-	if (source == NULL) return VECTOR_ERROR;
-	if (vector_is_initialized(destination)) return VECTOR_ERROR;
-	if (!vector_is_initialized(source)) return VECTOR_ERROR;
+	if (dst == NULL) return VECTOR_ERROR;
+	if (src == NULL) return VECTOR_ERROR;
+	if (vector_is_initialized(dst)) return VECTOR_ERROR;
+	if (!vector_is_initialized(src)) return VECTOR_ERROR;
 
-	destination->size = source->size;
-	destination->capacity = source->size * 2;
-	destination->element_size = source->element_size;
+	dst->size = src->size;
+	dst->capacity = src->size * 2;
+	dst->element_size = src->element_size;
 
-	destination->data = malloc(destination->capacity * source->element_size);
-	if (destination->data == NULL) return VECTOR_ERROR;
+	dst->data = malloc(dst->capacity * src->element_size);
+	if (dst->data == NULL) return VECTOR_ERROR;
 
-	memcpy(destination->data, source->data, vector_byte_size(source));
+	memcpy(dst->data, src->data, vector_byte_size(src));
 
 	return VECTOR_SUCCESS;
 }
 
-int vector_copy_assign(Vector* destination, Vector* source) 
+extern int vector_copy_assign(Vector* dst, Vector* src)
 {
-	assert(destination != NULL);
-	assert(source != NULL);
-	assert(vector_is_initialized(source));
-	assert(vector_is_initialized(destination));
+	assert(dst != NULL);
+	assert(src != NULL);
+	assert(vector_is_initialized(src));
+	assert(vector_is_initialized(dst));
 
-	if (destination == NULL) return VECTOR_ERROR;
-	if (source == NULL) return VECTOR_ERROR;
-	if (!vector_is_initialized(destination)) return VECTOR_ERROR;
-	if (!vector_is_initialized(source)) return VECTOR_ERROR;
+	if (dst == NULL) return VECTOR_ERROR;
+	if (src == NULL) return VECTOR_ERROR;
+	if (!vector_is_initialized(dst)) return VECTOR_ERROR;
+	if (!vector_is_initialized(src)) return VECTOR_ERROR;
 
-	vector_destroy(destination);
+	vector_destroy(dst);
 
-	return vector_copy(destination, source);
+	return vector_copy(dst, src);
 }
 
-int vector_move(Vector* destination, Vector* source) 
+extern int vector_move(Vector* dst, Vector* src)
 {
-	assert(destination != NULL);
-	assert(source != NULL);
+	assert(dst != NULL);
+	assert(src != NULL);
 
-	if (destination == NULL) return VECTOR_ERROR;
-	if (source == NULL) return VECTOR_ERROR;
+	if (dst == NULL) return VECTOR_ERROR;
+	if (src == NULL) return VECTOR_ERROR;
 
-	*destination = *source;
-	source->data = NULL;
+	*dst = *src;
+	src->data = NULL;
 
 	return VECTOR_SUCCESS;
 }
 
-int vector_move_assign(Vector* destination, Vector* source)
+extern int vector_move_assign(Vector* dst, Vector* src)
 {
-	vector_swap(destination, source);
-	return vector_destroy(source);
+	vector_swap(dst, src);
+	return vector_destroy(src);
 }
 
-int vector_swap(Vector* destination, Vector* source) 
+extern int vector_swap(Vector* dst, Vector* src)
 {
 	void* temp;
 
-	assert(destination != NULL);
-	assert(source != NULL);
-	assert(vector_is_initialized(source));
-	assert(vector_is_initialized(destination));
+	assert(dst != NULL);
+	assert(src != NULL);
+	assert(vector_is_initialized(src));
+	assert(vector_is_initialized(dst));
 
-	if (destination == NULL) return VECTOR_ERROR;
-	if (source == NULL) return VECTOR_ERROR;
-	if (!vector_is_initialized(destination)) return VECTOR_ERROR;
-	if (!vector_is_initialized(source)) return VECTOR_ERROR;
+	if (dst == NULL) return VECTOR_ERROR;
+	if (src == NULL) return VECTOR_ERROR;
+	if (!vector_is_initialized(dst)) return VECTOR_ERROR;
+	if (!vector_is_initialized(src)) return VECTOR_ERROR;
 
-	_vector_swap(&destination->size, &source->size);
-	_vector_swap(&destination->capacity, &source->capacity);
-	_vector_swap(&destination->element_size, &source->element_size);
+	_vector_swap(&dst->size, &src->size);
+	_vector_swap(&dst->capacity, &src->capacity);
+	_vector_swap(&dst->element_size, &src->element_size);
 
-	temp = destination->data;
-	destination->data = source->data;
-	source->data = temp;
+	temp = dst->data;
+	dst->data = src->data;
+	src->data = temp;
 
 	return VECTOR_SUCCESS;
 }
 
-/* Insertion */
-int vector_push_back(Vector* vector, uint8_t** element)
+// Insertion 
+extern int vector_push_back(Vector* vector, uint8_t** element)
 {
 	assert(vector != NULL);
 	assert(element != NULL);
@@ -135,6 +145,55 @@ int vector_push_back(Vector* vector, uint8_t** element)
 	++vector->size;
 
 	return VECTOR_SUCCESS;
+}
+
+extern int vector_push_front(Vector *vector, uint8_t **element)
+{
+	return vector_insert(vector, 0, element);
+}
+
+extern int vector_insert(Vector *vector, size_t index, uint8_t **element)
+{
+	uint8_t **offset;
+	assert(vector != NULL);
+	assert(element != NULL);
+	assert(index <= vector->size);
+
+	if (vector == NULL) return VECTOR_ERROR;
+	if (element == NULL) return VECTOR_ERROR;
+	if (index > vector->size) return VECTOR_ERROR;
+	if (vector->element_size == 0) return VECTOR_ERROR;
+
+	if (_vector_should_grow(vector))
+		if (_vector_adjust_capacity(vector) == VECTOR_ERROR)
+			return VECTOR_ERROR;
+	
+	if (_vector_move_right(vector, index) != VECTOR_SUCCESS)
+		return VECTOR_ERROR;
+
+	offset = _vector_offset(vector, index);
+
+
+
+	offset = _vector_offset(vector, index);
+	memcpy(offset, element, vector->element_size);
+	++vector->size;
+
+	return VECTOR_SUCCESS;
+}
+
+extern int vector_assign(Vector *vector, size_t index, uint8_t **element)
+{
+	assert(vector != NULL);
+	assert(element != NULL);
+	assert(index < vector->size);
+
+	if (vector == NULL) return VECTOR_ERROR;
+	if (element == NULL) return VECTOR_ERROR;
+	if (index >= vector->size) return VECTOR_ERROR;
+	if (vector->element_size == 0) return VECTOR_ERROR;
+
+	_vector_assign(vector, index, element);
 }
 
 extern bool vector_is_initialized(const Vector *vector)
@@ -159,6 +218,8 @@ extern int vector_destroy(Vector *vector)
 	return VECTOR_SUCCESS;
 }
 
+
+// Static
 static void _vector_swap(size_t *first, size_t *second)
 {
 	size_t temp = *first;
@@ -204,10 +265,25 @@ static void _vector_assign(Vector *vector, size_t index, uint8_t **element)
 {
 	uint8_t **offset = _vector_offset(vector, index);
 	memcpy(offset, element, vector->element_size);
-	//*offset = *element;
 }
 
-void* _vector_offset(Vector* vector, size_t index)
+static uint8_t** _vector_offset(Vector* vector, size_t index)
 {
 	return vector->data + (index * vector->element_size);
+}
+
+static int _vector_move_right(Vector *vector, size_t index)
+{
+	assert(vector->size < vector->capacity);
+
+	uint8_t **offset = _vector_offset(vector, vector->size - 1);
+	size_t elements_in_bytes = (vector->size - index) * vector->element_size;
+
+	for (size_t i = elements_in_bytes; i > 0; i -= vector->element_size)
+	{
+		memmove(offset + vector->element_size, offset, vector->element_size);
+		offset -= vector->element_size;
+	}
+
+	return VECTOR_SUCCESS;
 }
