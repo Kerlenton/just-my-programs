@@ -69,8 +69,9 @@ extern int vector_swap(Vector *dst, Vector *src);
 
 // Insertion
 extern int vector_push_back(Vector *vector, uint8_t **element);
-
-
+extern int vector_push_front(Vector *vector, uint8_t **element);
+extern int vector_assign(Vector *vector, size_t index, uint8_t **element);
+extern int vector_insert(Vector *vector, size_t index, uint8_t **element);
 
 
 
@@ -91,6 +92,5 @@ static bool _vector_should_grow(Vector *vector);
 static int _vector_adjust_capacity(Vector *vector);
 static int _vector_reallocate(Vector *vector, size_t new_capacity);
 static void _vector_assign(Vector *vector, size_t index, uint8_t **element);
-void* _vector_offset(Vector* vector, size_t index);
-
-
+static uint8_t** _vector_offset(Vector* vector, size_t index);
+static int _vector_move_right(Vector *vector, size_t index);
