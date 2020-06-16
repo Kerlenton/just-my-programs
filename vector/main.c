@@ -14,14 +14,18 @@ int main()
 	vector_setup(v, 5, sizeof(uint8_t*));
 	vector_push_back(v, &p);
 	vector_push_back(v, &q);
+	vector_push_back(v, &r);
 
+	/*printf("%s\n", *(v->data));
+	printf("%s\n", *(v->data + v->element_size));
+	printf("%s\n", *(v->data + 2*v->element_size));*/
+
+	
+
+	//printf("%s\n", *(v->data - v->element_size));
 	printf("%s\n", *(v->data));
 	printf("%s\n", *(v->data + v->element_size));
 
-	vector_assign(v, 0, &r);
-
-	printf("%s\n", *(v->data));
-	printf("%s\n", *(v->data + v->element_size));
 
 	getchar();
 	system("PAUSE");
@@ -196,6 +200,186 @@ extern int vector_assign(Vector *vector, size_t index, uint8_t **element)
 	_vector_assign(vector, index, element);
 }
 
+
+// Delition
+extern int vector_pop_back(Vector *vector)
+{
+	assert(vector != NULL);
+	assert(vector->size > 0);
+
+	if (vector == NULL) return VECTOR_ERROR;
+	if (vector->size <= 0) return VECTOR_ERROR;
+	if (vector->element_size == 0) return VECTOR_ERROR;
+
+	--vector->size;
+
+	if (_vector_should_shrink(vector))
+		_vector_adjust_capacity(vector);
+
+	return VECTOR_SUCCESS;
+}
+
+extern int vector_pop_front(Vector *vector)
+{
+	vector_erase(vector, 0);
+}
+
+extern int vector_erase(Vector *vector, size_t index)
+{
+	assert(vector != NULL);
+	assert(index < vector->size);
+
+	if (vector == NULL) return VECTOR_ERROR;
+	if (index >= vector->size) return VECTOR_ERROR;
+	if (vector->element_size == 0) return VECTOR_ERROR;
+
+	_vector_move_left(vector, index);
+
+	if (--vector->size == vector->capacity /  4)
+		_vector_adjust_capacity(vector);
+
+	return VECTOR_SUCCESS;
+}
+
+extern int vector_clear(Vector *vector)
+{
+	vector_resize(vector, 0);
+}
+
+// Memory managment
+
+extern int vector_resize(Vector *vector, size_t new_size)
+{
+	if (new_size <= vector->capacity * VECTOR_SHRINK_THRESHOLD)
+	{
+		vector->size = new_size;
+
+		if (_vector_reallocate(vector, new_size * VECTOR_GROWTH_FACTOR) == VECTOR_ERROR)
+			return VECTOR_ERROR;
+	}
+
+	else if (new_size > vector->capacity)
+		if (_vector_reallocate(vector, new_size * VECTOR_GROWTH_FACTOR) == VECTOR_ERROR)
+			return VECTOR_ERROR;
+
+	vector->size = new_size;
+	return VECTOR_SUCCESS;
+}
+
+extern int vector_reserve(Vector *vector, size_t minimum_capacity)
+{
+	if (minimum_capacity > vector->capacity)
+		if (_vector_reallocate(vector, minimum_capacity) == VECTOR_ERROR)
+			return VECTOR_ERROR;
+	return VECTOR_SUCCESS;
+}
+
+extern int vector_shrink_to_fit(Vector *vector)
+{
+	return _vector_reallocate(vector, vector->size);
+}
+
+
+// Iterators
+
+extern Iterator vector_begin(Vector *vector)
+{
+	return vector_iterator(vector, 0);
+}
+
+extern Iterator vector_end(Vector *vector)
+{
+	return vector_iterator(vector, vector->size - 1);
+}
+
+
+extern Iterator vector_iterator(Vector* vector, size_t index)
+{
+	Iterator iterator = { NULL, 0 };
+
+	assert(vector != NULL);
+	assert(index < vector->size);
+
+	if (vector == NULL) return iterator;
+	if (index >= vector->size) return iterator;
+	if (vector->element_size == 0) return iterator;
+
+	iterator.pointer = _vector_offset(vector, index);
+	iterator.element_size = vector->element_size;
+
+	return iterator;
+}
+
+extern uint8_t **iterator_get(Iterator* iterator) {
+	return iterator->pointer;
+}
+
+extern int iterator_erase(Vector* vector, Iterator* iterator) 
+{
+	size_t index = iterator_index(vector, iterator);
+
+	if (vector_erase(vector, index) == VECTOR_ERROR) {
+		return VECTOR_ERROR;
+	}
+
+	*iterator = vector_iterator(vector, index);
+
+	return VECTOR_SUCCESS;
+}
+
+extern void iterator_increment(Iterator *iterator)
+{
+	assert(iterator != NULL);
+	iterator->pointer += iterator->element_size;
+}
+
+extern void iterator_decrement(Iterator *iterator)
+{
+	assert(iterator != NULL);
+	iterator->pointer -= iterator->element_size;
+}
+
+extern uint8_t **iterator_next(Iterator *iterator)
+{
+	uint8_t **current = iterator->pointer;
+	iterator_increment(iterator);
+
+	return current;
+}
+
+extern uint8_t **iterator_previous(Iterator *iterator)
+{
+	uint8_t **current = iterator->pointer;
+	iterator_decrement(iterator);
+
+	return current;
+}
+
+bool iterator_equals(Iterator* first, Iterator* second) 
+{
+	assert(first->element_size == second->element_size);
+	return first->pointer == second->pointer;
+}
+
+bool iterator_is_before(Iterator* first, Iterator* second) {
+	assert(first->element_size == second->element_size);
+	return first->pointer < second->pointer;
+}
+
+bool iterator_is_after(Iterator* first, Iterator* second) {
+	assert(first->element_size == second->element_size);
+	return first->pointer > second->pointer;
+}
+
+extern size_t iterator_index(Vector* vector, Iterator* iterator)
+{
+	assert(vector != NULL);
+	assert(iterator != NULL);
+	return (iterator->pointer - vector->data) / vector->element_size;
+
+}
+//----------------------------------
+
 extern bool vector_is_initialized(const Vector *vector)
 {
 	return vector->data != NULL;
@@ -216,6 +400,39 @@ extern int vector_destroy(Vector *vector)
 	vector->data = NULL;
 
 	return VECTOR_SUCCESS;
+}
+
+extern size_t vector_free_space(Vector* vector)
+{
+	return vector->capacity - vector->size;
+}
+
+extern bool vector_is_empty(Vector* vector) 
+{
+	return vector->size == 0;
+}
+
+// Look
+extern void* vector_get(Vector* vector, size_t index) 
+{
+	assert(vector != NULL);
+	assert(index < vector->size);
+
+	if (vector == NULL) return NULL;
+	if (vector->element_size == 0) return NULL;
+	if (index >= vector->size) return NULL;
+
+	return _vector_offset(vector, index);
+}
+
+extern void* vector_front(Vector* vector) 
+{
+	return vector_get(vector, 0);
+}
+
+extern void* vector_back(Vector* vector) 
+{
+	return vector_get(vector, vector->size - 1);
 }
 
 
@@ -255,6 +472,7 @@ static int _vector_reallocate(Vector *vector, size_t new_capacity)
 	new_capacity_in_bytes = new_capacity * vector->element_size;
 	old = vector->data;
 
+
 	if ((vector->data = malloc(new_capacity_in_bytes)) == NULL)  return VECTOR_ERROR;
 
 
@@ -286,4 +504,29 @@ static int _vector_move_right(Vector *vector, size_t index)
 	}
 
 	return VECTOR_SUCCESS;
+}
+
+static bool _vector_should_shrink(Vector *vector)
+{
+	assert(vector->size <= vector->capacity);
+	return vector->size == vector->capacity * VECTOR_SHRINK_THRESHOLD;
+}
+
+static void _vector_move_left(Vector *vector, size_t index)
+{
+	uint8_t **offset = _vector_offset(vector, 1);
+	size_t elements_in_bytes = (vector->size - index - 1) * vector->element_size;
+
+	for (size_t i = elements_in_bytes; i > 0; i -= vector->element_size)
+	{
+		memmove(offset - vector->element_size, offset, vector->element_size);
+		offset += vector->element_size;
+	}
+
+	return VECTOR_SUCCESS;
+}
+
+static size_t _vector_free_bytes(const Vector* vector)
+{
+	return vector_free_space(vector) * vector->element_size;
 }
