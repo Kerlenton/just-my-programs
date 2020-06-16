@@ -5,33 +5,6 @@
 
 #include "vector.h"
 
-int main()
-{
-	Vector *v = (Vector*)malloc(sizeof(Vector));
-	uint8_t *p = "helllo";
-	uint8_t *q = "hi";
-	uint8_t *r = "he";
-	vector_setup(v, 5, sizeof(uint8_t*));
-	vector_push_back(v, &p);
-	vector_push_back(v, &q);
-	vector_push_back(v, &r);
-
-	/*printf("%s\n", *(v->data));
-	printf("%s\n", *(v->data + v->element_size));
-	printf("%s\n", *(v->data + 2*v->element_size));*/
-
-	
-
-	//printf("%s\n", *(v->data - v->element_size));
-	printf("%s\n", *(v->data));
-	printf("%s\n", *(v->data + v->element_size));
-
-
-	getchar();
-	system("PAUSE");
-	return 0;
-}
-
 extern int vector_setup(Vector* vector, size_t capacity, size_t element_size) 
 {
 	assert(vector != NULL);
