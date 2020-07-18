@@ -1,4 +1,4 @@
-// Загадка Эйнштейна
+// Г‡Г ГЈГ Г¤ГЄГ  ГќГ©Г­ГёГІГҐГ©Г­Г 
 #include <iostream>
 using namespace std;
 
@@ -21,7 +21,7 @@ const char *NationalityStr[] = { "Norwegian", "Englishman", "Dane", "German", "S
 
 enum Property { Color, Drink, Pet, Cigarettes, Nationality, PropertiesCount };
 
-// На одной улице подряд стоят пять домов,
+// There are five houses in a row on one street,
 const size_t HousesCount = 5;
 
 int s[HousesCount][PropertiesCount];
@@ -34,8 +34,8 @@ bool neighborOf(size_t i, int property, int value)
 
 bool check()
 {
-	// каждый — своего цвета. В каждом живёт человек, все пять — разных национальностей.
-	// Каждый человек предпочитает уникальную марку сигарет, напиток и домашнее животное.
+	// each with its own color. A person lives in each, all five are of different nationalities.
+	// Each person prefers a unique brand of cigarette, drink and pet.
 	for (size_t i = 0; i < HousesCount; ++i)
 	{
 		for (size_t j = 0; j < PropertiesCount; ++j)
@@ -50,67 +50,67 @@ bool check()
 		}
 	}
 
-	// Кроме того:
-	// Норвежец живёт в первом доме.
+	// Besides:
+	// The Norwegian lives in the first house.
 	if (s[0][Nationality] != Norwegian && s[0][Nationality] != _)
 		return false;
-	// Англичанин живёт в красном доме.
+	// The Englishman lives in the red house.
 	for (size_t i = 0; i < HousesCount; ++i)
 		if (s[i][Nationality] == Englishman && s[i][Color] != _ && s[i][Color] != Red)
 			return false;
-	// Зелёный дом находится слева от белого, рядом с ним.
+	// The green house is to the left of the white one, next to it.
 	for (size_t i = 0; i < HousesCount - 1; ++i)
 		if (s[i][Color] == Green && s[i + 1][Color] != _ && s[i + 1][Color] != White)
 			return false;
-	// Датчанин пьёт чай.
+	// The Dane is drinking tea.
 	for (size_t i = 0; i < HousesCount; ++i)
 		if (s[i][Nationality] == Dane && s[i][Drink] != _ && s[i][Drink] != Tea)
 			return false;
-	// Тот, кто курит Marlboro, живёт рядом с тем, кто выращивает кошек.
+	// Anyone who smokes Marlboro lives next to someone who raises cats.
 	for (size_t i = 0; i < HousesCount; ++i)
 		if (s[i][Cigarettes] == Marlboro && !neighborOf(i, Pet, Cat))
 			return false;
-	// Тот, кто живёт в жёлтом доме, курит Dunhill.
+	// The one who lives in the yellow house smokes Dunhill.
 	for (size_t i = 0; i < HousesCount; ++i)
 		if (s[i][Color] == Yellow && s[i][Cigarettes] != _ && s[i][Cigarettes] != Dunhill)
 			return false;
-	// Немец курит Rothmans.
+	// The German smokes Rothmans.
 	for (size_t i = 0; i < HousesCount; ++i)
 		if (s[i][Nationality] == German && s[i][Cigarettes] != _ && s[i][Cigarettes] != Rothmans)
 			return false;
-	// Тот, кто живёт в центре, пьёт молоко.
+	// The one who lives in the center drinks milk.
 	if (s[2][Drink] != _ && s[2][Drink] != Milk)
 		return false;
-	// Сосед того, кто курит Marlboro, пьёт воду.
+	// The neighbor who smokes Marlboro drinks water.
 	for (size_t i = 0; i < HousesCount; ++i)
 		if (s[i][Cigarettes] == Marlboro && !neighborOf(i, Drink, Water))
 			return false;
-	// Тот, кто курит Pall Mall, выращивает птиц.
+	// Pall Mall smokers raise birds.
 	for (size_t i = 0; i < HousesCount; ++i)
 		if (s[i][Cigarettes] == PallMall && s[i][Pet] != _ && s[i][Pet] != Bird)
 			return false;
-	// Швед выращивает собак.
+	// The Swede raises dogs.
 	for (size_t i = 0; i < HousesCount; ++i)
 		if (s[i][Nationality] == Swede && s[i][Pet] != _ && s[i][Pet] != Dog)
 			return false;
-	// Норвежец живёт рядом с синим домом.
+	// The Norwegian lives next to the blue house.
 	for (size_t i = 0; i < HousesCount; ++i)
 		if (s[i][Nationality] == Norwegian && !neighborOf(i, Color, Blue))
 			return false;
-	// Тот, кто выращивает лошадей, живёт в синем доме.
+	// The one who raises horses lives in a blue house.
 	for (size_t i = 0; i < HousesCount; ++i)
 		if (s[i][Pet] == Horse && s[i][Color] != _ && s[i][Color] != Blue)
 			return false;
-	// Тот, кто курит Winfield, пьет пиво.
+	// Whoever smokes Winfield drinks beer.
 	for (size_t i = 0; i < HousesCount; ++i)
 		if (s[i][Cigarettes] == Winfield && s[i][Drink] != _ && s[i][Drink] != Beer)
 			return false;
-	// В зелёном доме пьют кофе.
+	// They drink coffee in the green house.
 	for (size_t i = 0; i < HousesCount; ++i)
 		if (s[i][Color] == Green && s[i][Drink] != _ && s[i][Drink] != Coffee)
 			return false;
-	// Вопрос:
-	// Кто разводит рыбок?
+	// Question:
+	// Who breeds the fish?
 	return true;
 }
 
