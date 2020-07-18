@@ -1,4 +1,4 @@
-// Çàãàäêà Ýéíøòåéíà
+// Zebra Puzzle
 #include <iostream>
 using namespace std;
 
