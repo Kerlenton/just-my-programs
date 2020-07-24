@@ -26,6 +26,7 @@ typedef struct
 chain_t *init_chain()
 {
 	chain_t* ch = (chain_t*)malloc(sizeof(chain_t));
+	ch->first = NULL;
 	ch->next = NULL;
 
 	return ch;
@@ -35,6 +36,7 @@ RNA *init_rna()
 {
 	RNA *rna = (RNA*)malloc(sizeof(RNA));
 	rna->chain = (chain_t*)malloc(sizeof(chain_t));
+	rna->chain->first = NULL;
 	rna->chain->next = NULL;
 
 	return rna;
@@ -43,6 +45,15 @@ RNA *init_rna()
 DNA *init_dna()
 {
 	DNA *dna = (RNA*)malloc(sizeof(RNA));
+
+	dna->chain1 = (chain_t*)malloc(sizeof(chain_t));
+	dna->chain2 = (chain_t*)malloc(sizeof(chain_t));
+
+	dna->chain1->first = NULL;
+	dna->chain1->next = NULL;
+
+	dna->chain2->first = NULL;
+	dna->chain2->next = NULL;
 
 	return dna;
 }
@@ -76,9 +87,10 @@ DNA *create_dna(chain_t *ch1, chain_t *ch2)
 
 void chain_push_back(chain_t *chain, nucleotide nuc)
 {
-	if (chain->next == NULL)
+	if (chain->next == NULL && chain->first == NULL)
 	{
 		chain->first = nuc;
+		return;
 	}
 
 	while (chain->next != NULL)
@@ -108,46 +120,56 @@ void transcription(DNA *dna, RNA *rna)
 	}
 }
 
+void translation(RNA *rna)
+{
+
+}
+
+void printDNA(DNA *dna)
+{
+	chain_t *temp1 = dna->chain1;
+	chain_t *temp2 = dna->chain2;
+	while (temp1 != NULL)
+	{
+		printf("%c", temp1->first);
+		temp1 = temp1->next;
+	}
+	putchar('\n');
+
+	while (temp2 != NULL)
+	{
+		printf("%c", temp2->first);
+		temp2 = temp2->next;
+	}
+	putchar('\n');
+}
+
+printRNA(RNA *rna)
+{
+	chain_t *temp = rna->chain;
+	while (temp != NULL)
+	{
+		printf("%c", temp->first);
+		temp = temp->next;
+	}
+	putchar('\n');
+}
+
 int main(void)
 {
 	setlocale(LC_ALL, "Rus");
 
-	/*nucleotide n, n2;
-	n.nitrogenous_base = 'А';
-	n2.nitrogenous_base = 'Ц';
-
-	chain_t *chain = (chain_t*)malloc(sizeof(chain_t));
-	chain->first = &n;
-	chain->next = (chain_t*)malloc(sizeof(chain_t));
-	chain->next->first = &n2;
-	chain->next->next = NULL;
-
-	DNA *dna = (DNA*)malloc(sizeof(DNA));
-	dna->chain1 = (nucleotide*)malloc(sizeof(nucleotide));
-
-	dna->chain1 = chain;
-
-	RNA *rna = (RNA*)malloc(sizeof(RNA));
-
-	transcription(dna, rna);
-
-	printf("%c", rna->chain->first->nitrogenous_base);*/
-
 	nucleotide n = 'Г';
-	//nucleotide k = ' ';
 	chain_t *ch = create_chain(n);
-	//chain_t *kh = create_chain(k);
-	chain_push_back(ch, 'Г');
 
-	//RNA *rna = create_rna(kh, 'v');
+	chain_push_back(ch, 'Г');
 	RNA *rna = init_rna();
 	DNA *dna = create_dna(ch, ch);
 
 	transcription(dna, rna);
 
-	printf("%c", dna->chain1->first);
-	printf("%c", rna->chain->next->first);
+	printDNA(dna);
+	printRNA(rna);
 
-	system("PAUSE");
 	return 0;
 }
