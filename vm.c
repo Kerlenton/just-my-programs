@@ -174,7 +174,7 @@ void run(VM* vm) {
 }
 
 
-main()
+int main(void)
 {
 	const int fib = 0;  // address of the fibonacci procedure
 	int program[] = {
@@ -217,5 +217,5 @@ main()
 		0);    // locals to be reserved, fib doesn't require them
 	run(vm);
 
-	system("PAUSE");
+	return 0;
 }
