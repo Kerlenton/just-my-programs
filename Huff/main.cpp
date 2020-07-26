@@ -75,7 +75,7 @@ void BuildTable(node* root)
 		code.pop_back();
 }
 
-int main()
+int main(void)
 {
 	ifstream f("1.txt");
 	map<char, int> m;
