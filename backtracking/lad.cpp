@@ -43,7 +43,6 @@ void print()
 
       cout << endl;
    }
-
 }
 
 bool tryLad(int col)
