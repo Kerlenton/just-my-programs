@@ -97,7 +97,6 @@ bool tryQueen(int col)
 int main(void)
 {
    tryQueen(0);
-  
    
    return 0;
 }
