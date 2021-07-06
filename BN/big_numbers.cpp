@@ -87,3 +87,52 @@ BigNumber BigNumber::operator*(const BigNumber &y) const
     return result;
 }
 
+BigNumber BigNumber::operator/(const BigNumber &y) const
+{
+    BigNumber result;
+    BigNumber l;
+    
+    for (auto i = 0u; i < data_.size(); i++)
+    {
+        l.data_.push_front(data_[data_.size() - i - 1]);
+        auto div = findDiv(l, y);
+        result.data_.push_front(div);
+        l = l - BigNumber(div) * y;
+    }
+    
+    return result;
+}
+
+bool BigNumber::operator<(const BigNumber &y) const 
+{
+    for (auto i = std::max(data_.size(), y.data_.size()) - 1; i >= 0; i--)
+    {
+        auto xx = i >= data_.size() ? 0 : data_[i];
+        auto yy = i >= y.data_.size() ? 0 : y.data_[i];
+        
+        if (xx != yy)
+            return xx < yy;  
+    }
+    
+    return false;
+}
+
+unsigned BigNumber::findDiv(const BigNumber &dividend, const BigNumber &divisor) const
+{
+    unsigned first = 0;
+    unsigned last = BASE;
+    unsigned it;
+
+    while (last > first + 1)
+    {
+        it = (last + first) / 2;   
+        
+        if (dividend < BigNumber(it) * divisor)
+            last = it;
+            
+        else
+            first = it;  
+    }
+    
+    return first;
+}
